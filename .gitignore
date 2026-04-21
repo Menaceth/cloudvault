@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.serverless/
+
+# Environment variables (contains secrets!)
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+
+# Test files
+test.js
+backend_test.js
+
+# Firebase cache
+.firebase/

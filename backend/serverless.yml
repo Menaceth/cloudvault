@@ -1,0 +1,51 @@
+service: aws-file-sharing-system
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  role: arn:aws:iam::${aws:accountId}:role/LabRole
+  environment:
+    FILE_BUCKET: ${self:custom.fileBucketName}
+
+package:
+  patterns:
+    - 'src/**'
+    - '!node_modules/**'
+    - '!.serverless/**'
+    - '!package.json'
+    - '!package-lock.json'
+    - '!*.js'
+
+custom:
+  fileBucketName: ${self:service}-${self:provider.stage}-bucket-${aws:accountId}
+
+functions:
+  api:
+    handler: src/functions/api.handler
+    url:
+      cors: true
+
+resources:
+  Resources:
+    FileBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.fileBucketName}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ['*']
+              AllowedMethods: [GET, PUT, POST, DELETE, HEAD]
+              AllowedOrigins: ['*']
+              Id: CORSRuleId1
+              MaxAge: 3600
